@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Template xmlns="http://morfeo-project.org/2007/Template">
-    <!-- Gadget Meta-Info -->
     <Catalog.ResourceDescription>
         <Vendor>CoNWeT</Vendor>
-        <Name>GeoRSS Reader</Name>
+        <Name>georss-geowidget</Name>
+        <DisplayName>GeoRSS Reader</DisplayName>
         <Version>0.1</Version>
         <Author>jmostazo</Author>
         <Mail>jmostazo@fi.upm.es</Mail>
@@ -13,14 +13,9 @@
         <WikiURI>http://hercules.ls.fi.upm.es/public/conwet/ogf.html#georss</WikiURI>
     </Catalog.ResourceDescription>
 
-    <!-- EzWeb Gadgets Preferences -->
     <Platform.Preferences>
         <Preference name="feed_url_pref" type="text" label="Feed Url" description="Feed Url" default=""/>
     </Platform.Preferences>
-
-    <!-- EzWeb Gadget Persistent State -->
-    <Platform.StateProperties>
-    </Platform.StateProperties>
 
     <Platform.Wiring>
         <Event name="location_info_event" type="text" label="Location info" friendcode="location_info"/>
@@ -35,6 +30,4 @@
 
     <Platform.Rendering width="6" height="28"/>
 
-    <Platform.Context>
-    </Platform.Context> 
 </Template>
