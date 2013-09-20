@@ -22,7 +22,7 @@
  *
  */
 
-use('conwet.ui');
+use("conwet.ui");
 
 conwet.ui.MessageManager = Class.create({
 

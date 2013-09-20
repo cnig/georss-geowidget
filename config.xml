@@ -13,9 +13,9 @@
         <WikiURI>http://hercules.ls.fi.upm.es/public/conwet/ogf.html#georss</WikiURI>
     </Catalog.ResourceDescription>
 
-    <Platform.Preferences>
-        <Preference name="feed_url_pref" type="text" label="Feed Url" description="Feed Url" default=""/>
-    </Platform.Preferences>
+    <Platform.StateProperties>
+        <Property name="feed_url_pref" type="text" label="Feed Url" default=""/>
+    </Platform.StateProperties>
 
     <Platform.Wiring>
         <Event name="location_info_event" type="text" label="Location info" friendcode="location_info"/>

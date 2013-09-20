@@ -27,17 +27,18 @@ use("conwet");
 conwet.Gadget = Class.create({
 
     initialize: function() {
-        // EzWeb Variables
+        //Variables
         this.locationInfoEvent = new conwet.events.Event('location_info_event');
         this.locationEvent     = new conwet.events.Event('location_event');
         this.linkUrlEvent      = new conwet.events.Event('link_url_event');
 
-        this.feedUrlPref       = new conwet.events.Slot('feed_url_pref', this.getRSS.bind(this));
+        this.feedUrlPref       = MashupPlatform.widget.getVariable("feed_url_pref");
         this.rssServiceSlot    = new conwet.events.Slot('rss_service_slot', function(service) {
-            service = service.evalJSON();
+            service = JSON.parse(service);
             if (typeof service == 'object') {
                 if (('type' in service) && ('url' in service) && (service.type == "RSS") && (service.url != "")) {
                     this.getRSS(service.url);
+                    this.feedUrlPref.set(service.url);
                 }
             }
         }.bind(this));
@@ -50,7 +51,7 @@ conwet.Gadget = Class.create({
     },
 
     sendLocationInfo: function(lon, lat, title) {
-        this.locationInfoEvent.send(Object.toJSON({
+        this.locationInfoEvent.send(JSON.stringify({
             "position": {
                 "lon": lon,
                 "lat": lat
@@ -65,16 +66,16 @@ conwet.Gadget = Class.create({
             return;
         }
 
-        EzWebAPI.send_get(
-            url,
-            this,
-            function(transport) {
+        MashupPlatform.http.makeRequest(url, {
+            method: 'GET',
+            onSuccess: function(transport) {
                 this.drawRSS(transport.responseText);
             }.bind(this),
-            function(transport, e){
+            onFailure : function(transport, e){
                 this.showMessage(_("La url del feed no es válida."));
             }.bind(this)
-        );
+        });
+        
     },
 
     drawRSS: function(rss) {
@@ -176,7 +177,7 @@ conwet.Gadget = Class.create({
         }
         var linkElement = this._createLinkElement(aElement.innerHTML, aElement.href);
         aElement.parentNode.insertBefore(linkElement, aElement);
-        EzWebExt.removeFromParent(aElement);
+        aElement.parentNode.removeChild(aElement);
     },
 
     _createLinkElement: function(value, href) {

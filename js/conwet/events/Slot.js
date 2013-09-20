@@ -22,21 +22,23 @@
  *
  */
 
-use('conwet.events');
+use("conwet.events");
 
 conwet.events.Slot = Class.create({
 
     initialize: function(name, handler) {
         this.name    = name;
         this.handler = handler;
-        this.ezVar   = EzWebAPI.createRGadgetVariable(name, this._handler.bind(this));
+        this.lastValue = null;
+        MashupPlatform.wiring.registerCallback(this.name, this._handler.bind(this));
     },
 
     get: function() {
-        return this.ezVar.get();
+        return this.lastValue;
     },
 
     _handler: function(message) {
+        this.lastValue = message;
         this.handler(message);
     }
 
