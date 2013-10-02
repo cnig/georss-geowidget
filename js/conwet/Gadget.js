@@ -46,10 +46,16 @@ conwet.Gadget = Class.create({
         this.getRSS(this.feedUrlPref.get());
     },
 
+    /*
+     * This functions sends an event with the location.
+     */
     sendLocation: function(lon, lat) {
         this.locationEvent.send(lon + ", " + lat);
     },
 
+    /*
+     * This function sends and event with the location info
+     */
     sendLocationInfo: function(lon, lat, title) {
         this.locationInfoEvent.send(JSON.stringify({
             "position": {
@@ -60,6 +66,9 @@ conwet.Gadget = Class.create({
         }));
     },
 
+    /*
+     * This function makes an asynchronous request to the RSS service and the draws the info.
+     */
     getRSS: function(url) {
         if (url == "") {
             this.showMessage(_("Introduzca una URL en las preferencias de usuario del gadget."));
@@ -72,24 +81,52 @@ conwet.Gadget = Class.create({
                 this.drawRSS(transport.responseText);
             }.bind(this),
             onFailure : function(transport, e){
+                $('reloadImg').show();
+                $('reloadingImg').hide();
                 this.showMessage(_("La url del feed no es válida."));
             }.bind(this)
         });
         
     },
-
+    
+    /*
+     * This function draws the interface with the rss data. 
+     * Note: it cleans all the interface.
+     */
     drawRSS: function(rss) {
         this.clearUI();
 
         var parser = new conwet.parser.Parser();
         var chan = parser.parseRSS(rss);
-
+        var nameDiv = document.createElement('div');
         if (("link" in chan) && (chan.link != "")) {
-            $("chan_title").appendChild(this._createLinkElement(chan.name, chan.link));
+            nameDiv.appendChild(this._createLinkElement(chan.name, chan.link));
         }
         else {
-            $("chan_title").appendChild(document.createTextNode(chan.name));
+            nameDiv.appendChild(document.createTextNode(chan.name));
         }
+        nameDiv.addClassName("rss_server_name");
+        $("chan_title").appendChild(nameDiv);
+        
+        //Create the reload button
+        var reloadImg = document.createElement('img');
+        reloadImg.id = "reloadImg";
+        reloadImg.addClassName("rss_reload");
+        reloadImg.src = 'img/reload.png';
+        reloadImg.onclick = function(){
+            $('reloadImg').hide();
+            $('reloadingImg').show();
+            this.getRSS(this.feedUrlPref.get());
+        }.bind(this);
+        $("chan_title").appendChild(reloadImg);
+        
+        //Create the reloading imagen and hide it
+        var reloadingImg = document.createElement('img');
+        reloadingImg.id = "reloadingImg";
+        reloadingImg.addClassName("rss_reload");
+        reloadingImg.src = 'img/reloading.gif';
+        $(reloadingImg).hide();
+        $("chan_title").appendChild(reloadingImg);
 
         for (var i=0; i<chan.features.length; i++) {
             var feature = chan.features[i];

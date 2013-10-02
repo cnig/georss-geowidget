@@ -34,11 +34,8 @@ body {
     background: url("../img/layer-header.png") repeat-x scroll 0 0 #A5C3F1;
     display: block;
     height: 18px;
-    left: 0;
     padding: 0 5px;
-    position: absolute;
-    right: 0;
-    top: 0;
+    position: relative;
     overflow: hidden;
 }
 
@@ -136,4 +133,13 @@ body {
     right: 0;
     top: 36px;
     padding: 5px;
+}
+
+.rss_server_name {
+    display: inline;
+}
+
+.rss_reload {
+    position: fixed;
+    right: 10px; 
 }
