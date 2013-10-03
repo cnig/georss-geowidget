@@ -91,7 +91,7 @@ conwet.Gadget = Class.create({
     
     /*
      * This function draws the interface with the rss data. 
-     * Note: it cleans all the interface.
+     * Note: it cleans all the user interface.
      */
     drawRSS: function(rss) {
         this.clearUI();
