@@ -47,23 +47,17 @@ conwet.Gadget = Class.create({
     },
 
     /*
-     * This functions sends an event with the location.
+     * This functions sends an event with the locations to be highlighted.
      */
-    sendLocation: function(lon, lat) {
-        this.locationEvent.send(lon + ", " + lat);
+    highlightLocations: function(locations) {
+        this.locationEvent.send(JSON.stringify(locations));
     },
 
     /*
      * This function sends and event with the location info
      */
-    sendLocationInfo: function(lon, lat, title) {
-        this.locationInfoEvent.send(JSON.stringify({
-            "position": {
-                "lon": lon,
-                "lat": lat
-            },
-            "title": title
-        }));
+    sendLocationInfo: function(locations) {
+        this.locationInfoEvent.send(JSON.stringify(locations));
     },
 
     /*
@@ -128,9 +122,17 @@ conwet.Gadget = Class.create({
         $(reloadingImg).hide();
         $("chan_title").appendChild(reloadingImg);
 
+        var locationInfos = [];
         for (var i=0; i<chan.features.length; i++) {
             var feature = chan.features[i];
 
+            //Add this point to the list of locationInfo
+            locationInfos.push({
+                        lon: feature.location.lon,
+                        lat:feature.location.lat,
+                        title: feature.title
+                    });
+            
             var div = document.createElement("div");
             $(div).addClassName("feature");
 
@@ -143,8 +145,10 @@ conwet.Gadget = Class.create({
             div.appendChild(document.createTextNode(feature.title));
             div.observe("click", function(e) {
                 this.self._selectFeature(this.feature, this.div);
-                this.self.sendLocation(this.feature.location.lon, this.feature.location.lat);
-                this.self.sendLocationInfo(this.feature.location.lon, this.feature.location.lat, this.feature.title);
+                this.self.highlightLocations([{
+                        lon: this.feature.location.lon,
+                        lat:this.feature.location.lat
+                    }]);
             }.bind(context));
             div.observe("mouseover", function(e) {
                 this.div.addClassName("highlight");
@@ -154,6 +158,9 @@ conwet.Gadget = Class.create({
             }.bind(context), false);
             $("chan_items").appendChild(div);
         }
+        
+        //Send the points to be rendered in the map
+        sendLocationInfo(locationInfos);
     },
 
     _selectFeature: function(feature, element) {
