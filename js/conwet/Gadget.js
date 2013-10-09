@@ -160,7 +160,7 @@ conwet.Gadget = Class.create({
         }
         
         //Send the points to be rendered in the map
-        sendLocationInfo(locationInfos);
+        this.sendLocationInfo(locationInfos);
     },
 
     _selectFeature: function(feature, element) {
