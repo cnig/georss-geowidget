@@ -145,10 +145,10 @@ conwet.Gadget = Class.create({
             div.appendChild(document.createTextNode(feature.title));
             div.observe("click", function(e) {
                 this.self._selectFeature(this.feature, this.div);
-                this.self.highlightLocations([{
+                this.self.highlightLocations({
                         lon: this.feature.location.lon,
                         lat:this.feature.location.lat
-                    }]);
+                    });
             }.bind(context));
             div.observe("mouseover", function(e) {
                 this.div.addClassName("highlight");
