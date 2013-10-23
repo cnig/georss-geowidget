@@ -27,6 +27,9 @@ use("conwet");
 conwet.Gadget = Class.create({
 
     initialize: function() {
+        
+        this.messageManager = new conwet.ui.MessageManager(3000);
+        
         //Variables
         this.locationInfoEvent = new conwet.events.Event('location_info_event');
         this.locationEvent     = new conwet.events.Event('location_event');
@@ -37,13 +40,74 @@ conwet.Gadget = Class.create({
             service = JSON.parse(service);
             if (typeof service == 'object') {
                 if (('type' in service) && ('url' in service) && (service.type == "RSS") && (service.url != "")) {
-                    this.getRSS(service.url);
+                    
+                    //Clear the news list
+                    this.clear();
+                    
+                    //Stop the update interval
+                    this.clearUpdateInterval();
+                    
+                    //Get the new RSS info
+                    this.getRSS(service.url, false);
+                    
+                    //Set this as the current RSS service
                     this.feedUrlPref.set(service.url);
+                    
+                    //Start a new update interval
+                    this.launchUpdateInterval();
                 }
             }
         }.bind(this));
+        
+        this.updating = false; //Whether the widget is currently updating the data or not
+        this.displayedNews = [];
+        this.locationInfos = [];
+        
+        this.draw();
+        this.getRSS(this.feedUrlPref.get(), false);
+        
+        //Launch an update interval
+        this.launchUpdateInterval();
+    },
+     
+    launchUpdateInterval: function(){
+        this.interval = setInterval(function(){
+            if(!this.updating)
+                this.getRSS(this.feedUrlPref.get(), true);
+        }.bind(this),60000);
+    },
+            
+    clearUpdateInterval: function(){
+        clearInterval(this.interval);
+    },
+            
+    draw: function(){
 
-        this.getRSS(this.feedUrlPref.get());
+        var nameDiv = document.createElement('div');
+
+        nameDiv.appendChild(document.createTextNode(_("Añada un servidor GeoRSS")));
+        nameDiv.id = "rss_server_name";
+        nameDiv.addClassName("rss_server_name");
+        $("chan_title").appendChild(nameDiv);
+        
+        //Create the reload button
+        var reloadImg = document.createElement('img');
+        reloadImg.id = "reloadImg";
+        reloadImg.addClassName("rss_reload");
+        reloadImg.src = 'img/reload.png';
+        reloadImg.onclick = function(){
+            this.getRSS(this.feedUrlPref.get(), true);
+        }.bind(this);
+        $("chan_title").appendChild(reloadImg);
+        
+        //Create the reloading image and hide it
+        var reloadingImg = document.createElement('img');
+        reloadingImg.id = "reloadingImg";
+        reloadingImg.addClassName("rss_reload");
+        reloadingImg.src = 'img/reloading.gif';
+        $(reloadingImg).hide();
+        $("chan_title").appendChild(reloadingImg);
+
     },
 
     /*
@@ -63,21 +127,38 @@ conwet.Gadget = Class.create({
     /*
      * This function makes an asynchronous request to the RSS service and the draws the info.
      */
-    getRSS: function(url) {
+    getRSS: function(url, silent) {
         if (url == "") {
-            this.showMessage(_("Introduzca una URL en las preferencias de usuario del gadget."));
+            //this.showMessage(_("Introduzca una URL en las preferencias de usuario del gadget."));
             return;
         }
-
+        
+        $('reloadImg').hide();
+        $('reloadingImg').show();
+        
+        if(!silent)
+            this.showMessage("Solicitando datos al servidor.", true);
+        
+        //Set the status to updating.
+        //The interval cant update is there is already an update in process
+        this.updating = true;
+        
         MashupPlatform.http.makeRequest(url, {
             method: 'GET',
             onSuccess: function(transport) {
+                if(!silent)
+                    this.hideMessage();
                 this.drawRSS(transport.responseText);
+                $('reloadImg').show();
+                $('reloadingImg').hide();
+                this.updating = false;
             }.bind(this),
             onFailure : function(transport, e){
                 $('reloadImg').show();
                 $('reloadingImg').hide();
-                this.showMessage(_("La url del feed no es válida."));
+                if(!silent)
+                    this.showError("El servidor no responde.");
+                this.updating = false;
             }.bind(this)
         });
         
@@ -88,46 +169,33 @@ conwet.Gadget = Class.create({
      * Note: it cleans all the user interface.
      */
     drawRSS: function(rss) {
-        this.clearUI();
 
         var parser = new conwet.parser.Parser();
         var chan = parser.parseRSS(rss);
-        var nameDiv = document.createElement('div');
+        var nameDiv = $("rss_server_name");
+        nameDiv.innerHTML = "";
         if (("link" in chan) && (chan.link != "")) {
             nameDiv.appendChild(this._createLinkElement(chan.name, chan.link));
         }
         else {
             nameDiv.appendChild(document.createTextNode(chan.name));
         }
-        nameDiv.addClassName("rss_server_name");
-        $("chan_title").appendChild(nameDiv);
         
-        //Create the reload button
-        var reloadImg = document.createElement('img');
-        reloadImg.id = "reloadImg";
-        reloadImg.addClassName("rss_reload");
-        reloadImg.src = 'img/reload.png';
-        reloadImg.onclick = function(){
-            $('reloadImg').hide();
-            $('reloadingImg').show();
-            this.getRSS(this.feedUrlPref.get());
-        }.bind(this);
-        $("chan_title").appendChild(reloadImg);
         
-        //Create the reloading imagen and hide it
-        var reloadingImg = document.createElement('img');
-        reloadingImg.id = "reloadingImg";
-        reloadingImg.addClassName("rss_reload");
-        reloadingImg.src = 'img/reloading.gif';
-        $(reloadingImg).hide();
-        $("chan_title").appendChild(reloadingImg);
-
-        var locationInfos = [];
+        var firstChild = $("chan_items").firstChild;
+        
         for (var i=0; i<chan.features.length; i++) {
+    
             var feature = chan.features[i];
+            
+            if(this.displayedNews.indexOf(feature.title) != -1)
+                continue; //It is already displayed
+            
+            //Add it to the list of displayed news
+            this.displayedNews.push(feature.title);
 
             //Add this point to the list of locationInfo
-            locationInfos.push({
+            this.locationInfos.push({
                         lon: feature.location.lon,
                         lat:feature.location.lat,
                         title: feature.title
@@ -156,11 +224,13 @@ conwet.Gadget = Class.create({
             div.observe("mouseout", function(e) {
                 this.div.removeClassName("highlight");
             }.bind(context), false);
-            $("chan_items").appendChild(div);
+            
+            //Add new info just before the old info
+            $("chan_items").insertBefore(div, firstChild);
         }
         
         //Send the points to be rendered in the map
-        this.sendLocationInfo(locationInfos);
+        this.sendLocationInfo(this.locationInfos);
     },
 
     _selectFeature: function(feature, element) {
@@ -239,15 +309,23 @@ conwet.Gadget = Class.create({
         $("info").innerHTML = "";
     },
 
-    clearUI: function(message, time) {
+    clear: function(message, time) {
         this._clearDetails();
-        $("chan_title").innerHTML = "";
+        this.displayedNews = [];
+        this.locationInfos = [];
         $("chan_items").innerHTML = "";
     },
 
-    showMessage: function(message, time) {
-        this.clearUI();
-        $("chan_items").innerHTML = message;
+    showMessage: function(message, permanent) {
+        this.messageManager.showMessage(message, conwet.ui.MessageManager.INFO, permanent);
+    },
+
+    hideMessage: function() {
+        this.messageManager.hideMessage();
+    },
+
+    showError: function(message, permanent) {
+        this.messageManager.showMessage(message, conwet.ui.MessageManager.ERROR, permanent);
     }
 
 });

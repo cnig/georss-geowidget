@@ -55,6 +55,9 @@ conwet.parser.Parser = Class.create({
         if (dates.length == 0) {
             dates = doc.getElementsByTagNameNS("*","pubDate");
         }
+        if(dates.length != features.length){
+            dates = doc.getElementsByTagNameNS("*","updated"); //For ATOM
+        }
 
         for (var i=0; i<features.length; i++) {
             var feature = features[i];
@@ -62,6 +65,8 @@ conwet.parser.Parser = Class.create({
             if (!feature.geometry) {
                 continue;
             }
+            
+            
 
             chan.features.push({
                 "title":       (feature.attributes.title)? feature.attributes.title: "Sin titulo",

@@ -143,3 +143,7 @@ body {
     position: fixed;
     right: 10px; 
 }
+
+.no_display {
+    display: none !important;
+}
