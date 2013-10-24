@@ -183,6 +183,7 @@ conwet.Gadget = Class.create({
         
         
         var firstChild = $("chan_items").firstChild;
+        var newInfo = false;
         
         for (var i=0; i<chan.features.length; i++) {
     
@@ -191,15 +192,19 @@ conwet.Gadget = Class.create({
             if(this.displayedNews.indexOf(feature.title) != -1)
                 continue; //It is already displayed
             
+            //There is new info to be sent
+            newInfo = true;
+            
             //Add it to the list of displayed news
             this.displayedNews.push(feature.title);
 
             //Add this point to the list of locationInfo
             this.locationInfos.push({
-                        lon: feature.location.lon,
-                        lat:feature.location.lat,
-                        title: feature.title
-                    });
+                lon: feature.location.lon,
+                lat:feature.location.lat,
+                title: feature.title,
+                coordinates: feature.location.lon + "," +feature.location.lat
+            });
             
             var div = document.createElement("div");
             $(div).addClassName("feature");
@@ -215,7 +220,8 @@ conwet.Gadget = Class.create({
                 this.self._selectFeature(this.feature, this.div);
                 this.self.highlightLocations({
                         lon: this.feature.location.lon,
-                        lat:this.feature.location.lat
+                        lat:this.feature.location.lat,
+                        coordinates: feature.location.lon + "," +feature.location.lat
                     });
             }.bind(context));
             div.observe("mouseover", function(e) {
@@ -230,7 +236,8 @@ conwet.Gadget = Class.create({
         }
         
         //Send the points to be rendered in the map
-        this.sendLocationInfo(this.locationInfos);
+        if(newInfo)
+            this.sendLocationInfo(this.locationInfos);
     },
 
     _selectFeature: function(feature, element) {

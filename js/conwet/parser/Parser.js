@@ -50,14 +50,13 @@ conwet.parser.Parser = Class.create({
             "internalProjection": new OpenLayers.Projection('EPSG:4326')
         });
         var features = format.read(doc);
-
-        var dates = doc.getElementsByTagNameNS("*","date");
-        if (dates.length == 0) {
+        
+        var dates = doc.getElementsByTagNameNS("*","updated"); //For ATOM
+        if (dates.length == 0)
+            dates = doc.getElementsByTagNameNS("*","date");
+        if (dates.length == 0) 
             dates = doc.getElementsByTagNameNS("*","pubDate");
-        }
-        if(dates.length != features.length){
-            dates = doc.getElementsByTagNameNS("*","updated"); //For ATOM
-        }
+        
 
         for (var i=0; i<features.length; i++) {
             var feature = features[i];
@@ -73,7 +72,7 @@ conwet.parser.Parser = Class.create({
                 "description": (feature.attributes.description)? feature.attributes.description: "Sin descripción.",
                 "link":        (feature.attributes.link)? feature.attributes.link: "",
                 "location":    this.formatLocation(feature.geometry.getBounds().getCenterLonLat()),
-                "date":        this.formatDate(dates[i].textContent)
+                "date":        this.formatDate((i+1 < dates.length) ? dates[i+1].textContent : "")
             });
         }
 
