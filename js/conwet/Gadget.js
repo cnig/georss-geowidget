@@ -32,7 +32,7 @@ conwet.Gadget = Class.create({
         
         //Variables
         this.locationInfoEvent = new conwet.events.Event('location_info_event');
-        this.locationEvent     = new conwet.events.Event('location_event');
+        this.highlightLocationEvent     = new conwet.events.Event('highlight_location_event');
         this.linkUrlEvent      = new conwet.events.Event('link_url_event');
 
         this.feedUrlPref       = MashupPlatform.widget.getVariable("feed_url_pref");
@@ -48,7 +48,7 @@ conwet.Gadget = Class.create({
                     this.clearUpdateInterval();
                     
                     //Get the new RSS info
-                    this.getRSS(service.url, false);
+                    this.getRSS(service.url, false, true);
                     
                     //Set this as the current RSS service
                     this.feedUrlPref.set(service.url);
@@ -64,7 +64,7 @@ conwet.Gadget = Class.create({
         this.locationInfos = [];
         
         this.draw();
-        this.getRSS(this.feedUrlPref.get(), false);
+        this.getRSS(this.feedUrlPref.get(), false, true);
         
         //Launch an update interval
         this.launchUpdateInterval();
@@ -73,7 +73,7 @@ conwet.Gadget = Class.create({
     launchUpdateInterval: function(){
         this.interval = setInterval(function(){
             if(!this.updating)
-                this.getRSS(this.feedUrlPref.get(), true);
+                this.getRSS(this.feedUrlPref.get(), true, false);
         }.bind(this),60000);
     },
             
@@ -96,7 +96,7 @@ conwet.Gadget = Class.create({
         reloadImg.addClassName("rss_reload");
         reloadImg.src = 'img/reload.png';
         reloadImg.onclick = function(){
-            this.getRSS(this.feedUrlPref.get(), true);
+            this.getRSS(this.feedUrlPref.get(), true, true);
         }.bind(this);
         $("chan_title").appendChild(reloadImg);
         
@@ -114,7 +114,7 @@ conwet.Gadget = Class.create({
      * This functions sends an event with the locations to be highlighted.
      */
     highlightLocations: function(locations) {
-        this.locationEvent.send(JSON.stringify(locations));
+        this.highlightLocationEvent.send(JSON.stringify(locations));
     },
 
     /*
@@ -127,7 +127,7 @@ conwet.Gadget = Class.create({
     /*
      * This function makes an asynchronous request to the RSS service and the draws the info.
      */
-    getRSS: function(url, silent) {
+    getRSS: function(url, silent, forceSend) {
         if (url == "") {
             //this.showMessage(_("Introduzca una URL en las preferencias de usuario del gadget."));
             return;
@@ -148,7 +148,7 @@ conwet.Gadget = Class.create({
             onSuccess: function(transport) {
                 if(!silent)
                     this.hideMessage();
-                this.drawRSS(transport.responseText);
+                this.drawRSS(transport.responseText, forceSend);
                 $('reloadImg').show();
                 $('reloadingImg').hide();
                 this.updating = false;
@@ -168,7 +168,7 @@ conwet.Gadget = Class.create({
      * This function draws the interface with the rss data. 
      * Note: it cleans all the user interface.
      */
-    drawRSS: function(rss) {
+    drawRSS: function(rss, forceSend) {
 
         var parser = new conwet.parser.Parser();
         var chan = parser.parseRSS(rss);
@@ -236,7 +236,7 @@ conwet.Gadget = Class.create({
         }
         
         //Send the points to be rendered in the map
-        if(newInfo)
+        if(newInfo || forceSend)
             this.sendLocationInfo(this.locationInfos);
     },
 

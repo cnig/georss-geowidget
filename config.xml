@@ -19,7 +19,7 @@
 
     <Platform.Wiring>
         <Event name="location_info_event" type="text" label="Location info" friendcode="location_info"/>
-        <Event name="location_event"      type="text" label="Location"      friendcode="location"/>
+        <Event name="highlight_location_event" type="text" label="Highlight location" friendcode="location"/>
         <Slot  name="rss_service_slot"    type="text" label="GeoRSS info"   friendcode="service_info"/>
         <Event name="link_url_event"      type="text" label="Link url"      friendcode="url"/>
     </Platform.Wiring>
