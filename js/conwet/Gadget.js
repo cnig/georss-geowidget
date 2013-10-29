@@ -221,7 +221,7 @@ conwet.Gadget = Class.create({
                 this.self.highlightLocations({
                         lon: this.feature.location.lon,
                         lat:this.feature.location.lat,
-                        coordinates: feature.location.lon + "," +feature.location.lat
+                        coordinates: this.feature.location.lon + "," +this.feature.location.lat
                     });
             }.bind(context));
             div.observe("mouseover", function(e) {
