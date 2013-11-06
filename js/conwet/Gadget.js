@@ -199,12 +199,14 @@ conwet.Gadget = Class.create({
             this.displayedNews.push(feature.title);
 
             //Add this point to the list of locationInfo
-            this.locationInfos.push({
-                lon: feature.location.lon,
-                lat:feature.location.lat,
-                title: feature.title,
-                coordinates: feature.location.lon + "," +feature.location.lat
-            });
+            if(feature.location != null){
+                this.locationInfos.push({
+                    lon: feature.location.lon,
+                    lat:feature.location.lat,
+                    title: feature.title,
+                    coordinates: feature.location.lon + "," +feature.location.lat
+                });
+            }
             
             var div = document.createElement("div");
             $(div).addClassName("feature");
@@ -218,11 +220,13 @@ conwet.Gadget = Class.create({
             div.appendChild(document.createTextNode(feature.title));
             div.observe("click", function(e) {
                 this.self._selectFeature(this.feature, this.div);
-                this.self.highlightLocations({
+                if(this.feature.location != null){
+                    this.self.highlightLocations({
                         lon: this.feature.location.lon,
                         lat:this.feature.location.lat,
                         coordinates: this.feature.location.lon + "," +this.feature.location.lat
                     });
+                }
             }.bind(context));
             div.observe("mouseover", function(e) {
                 this.div.addClassName("highlight");
@@ -276,10 +280,12 @@ conwet.Gadget = Class.create({
         dateElement.appendChild(document.createTextNode(feature.date));
         headElement.appendChild(dateElement);
 
-        var locationElement = document.createElement("div");
-        locationElement.addClassName("info_location");
-        locationElement.appendChild(document.createTextNode(feature.location.lon + ", " + feature.location.lat));
-        headElement.appendChild(locationElement);
+        if(feature.location != null){
+            var locationElement = document.createElement("div");
+            locationElement.addClassName("info_location");
+            locationElement.appendChild(document.createTextNode(feature.location.lon + ", " + feature.location.lat));
+            headElement.appendChild(locationElement);
+        }
 
          var descriptionElement = document.createElement("div");
         descriptionElement.addClassName("info_description");
