@@ -59,6 +59,21 @@ conwet.Gadget = Class.create({
             }
         }.bind(this));
         
+        this.highlightLocationSlot = new conwet.events.Slot('highlight_location_slot', function(loc){
+            
+            //Get lon lat values
+            var lonlat = loc.split(",");
+            
+            //Round the coordinates
+            var parser = new conwet.parser.Parser();
+            lonlat[0] = parser._truncateNumber(lonlat[0]);
+            lonlat[1] = parser._truncateNumber(lonlat[1]);
+            
+            //Select the entry if exists in the list
+            this.handleHighlightLocation({lon: lonlat[0], lat: lonlat[1]});
+            
+        }.bind(this));
+        
         this.updating = false; //Whether the widget is currently updating the data or not
         this.displayedNews = [];
         this.locationInfos = [];
@@ -114,14 +129,32 @@ conwet.Gadget = Class.create({
      * This functions sends an event with the locations to be highlighted.
      */
     highlightLocations: function(locations) {
-        this.highlightLocationEvent.send(JSON.stringify(locations));
+            this.highlightLocationEvent.send(JSON.stringify(locations));
     },
 
     /*
-     * This function sends and event with the location info
+     * This function sends and event with the list of location infos
      */
     sendLocationInfo: function(locations) {
-        this.locationInfoEvent.send(JSON.stringify(locations));
+        if(locations.length)
+            this.locationInfoEvent.send(JSON.stringify(locations));
+    },
+    
+    /**
+     * 
+     */        
+    handleHighlightLocation: function(location){
+
+        //Search the entry and, if found, select it
+        for(var entryTitle in this.displayedNews){
+            var entry = this.displayedNews[entryTitle];
+            var entryLocation = entry.feature.location;
+            if(entryLocation != null && entryLocation.lon == location.lon && entryLocation.lat == location.lat){
+                this._selectFeature(entry.feature, entry.div);
+                break;
+            }
+        }
+
     },
 
     /*
@@ -148,7 +181,9 @@ conwet.Gadget = Class.create({
             onSuccess: function(transport) {
                 if(!silent)
                     this.hideMessage();
-                this.drawRSS(transport.responseText, forceSend);
+                try{
+                    this.drawRSS(transport.responseText, forceSend);
+                }catch(e){ };
                 $('reloadImg').show();
                 $('reloadingImg').hide();
                 this.updating = false;
@@ -189,14 +224,11 @@ conwet.Gadget = Class.create({
     
             var feature = chan.features[i];
             
-            if(this.displayedNews.indexOf(feature.title) != -1)
+            if(this.displayedNews[feature.title] != null)
                 continue; //It is already displayed
             
             //There is new info to be sent
             newInfo = true;
-            
-            //Add it to the list of displayed news
-            this.displayedNews.push(feature.title);
 
             //Add this point to the list of locationInfo
             if(feature.location != null){
@@ -212,9 +244,15 @@ conwet.Gadget = Class.create({
             $(div).addClassName("feature");
 
             var context = {
-                "div": div,
-                "feature": feature,
-                "self": this
+                div: div,
+                feature: feature,
+                self: this
+            };
+            
+            //Add it to the list of displayed news
+            this.displayedNews[feature.title] = {
+                div: div,
+                feature: feature
             };
 
             div.appendChild(document.createTextNode(feature.title));

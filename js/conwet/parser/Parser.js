@@ -60,16 +60,19 @@ conwet.parser.Parser = Class.create({
 
         for (var i=0; i<features.length; i++) {
             var feature = features[i];
-
-            chan.features.push({
-                "title":       (feature.attributes.title)? feature.attributes.title: "Sin titulo",
-                "description": (feature.attributes.description)? feature.attributes.description: "Sin descripción.",
-                "link":        (feature.attributes.link)? feature.attributes.link: "",
-                "date":        this.formatDate((i+1 < dates.length) ? dates[i+1].textContent : "")
-            });
+            
+            var newFeature = {
+                title:       (feature.attributes.title)? feature.attributes.title: "Sin titulo",
+                description: (feature.attributes.description)? feature.attributes.description: "Sin descripción.",
+                link:        (feature.attributes.link)? feature.attributes.link: "",
+                date:        this.formatDate((i+1 < dates.length) ? dates[i+1].textContent : "")
+            }
             
             if (feature.geometry != null)
-                chan.location = this.formatLocation(feature.geometry.getBounds().getCenterLonLat());
+                newFeature.location = this.formatLocation(feature.geometry.getBounds().getCenterLonLat());
+            
+            chan.features.push(newFeature);
+            
         }
 
         return chan;

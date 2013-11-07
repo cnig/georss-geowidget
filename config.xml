@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Template xmlns="http://morfeo-project.org/2007/Template">
+<Template xmlns="http://wirecloud.conwet.fi.upm.es/ns/template#">
     <Catalog.ResourceDescription>
         <Vendor>CoNWeT</Vendor>
         <Name>georss-geowidget</Name>
         <DisplayName>GeoRSS Reader</DisplayName>
-        <Version>0.2</Version>
+        <Version>0.4</Version>
         <Author>jmostazo</Author>
         <Mail>jmostazo@fi.upm.es</Mail>
         <Description>This widget shows GeoRSS feeds. It shares the location of the feed with other widgets.</Description>
@@ -20,8 +20,9 @@
     <Platform.Wiring>
         <Event name="location_info_event" type="text" label="Location info" friendcode="location_info"/>
         <Event name="highlight_location_event" type="text" label="Highlight location" friendcode="location"/>
-        <Slot  name="rss_service_slot"    type="text" label="GeoRSS info"   friendcode="service_info"/>
-        <Event name="link_url_event"      type="text" label="Link url"      friendcode="url"/>
+        <Event name="link_url_event" type="text" label="Link url" friendcode="url"/>
+        <Slot  name="rss_service_slot" type="text" label="GeoRSS info" friendcode="service_info"/>
+        <Slot  name="highlight_location_slot" type="text" label="Highlight location" friendcode="location"/>
     </Platform.Wiring>
 
     <Platform.Link>
