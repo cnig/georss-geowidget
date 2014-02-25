@@ -178,6 +178,9 @@ conwet.Gadget = Class.create({
         //Set the status to updating.
         //The interval cant update is there is already an update in process
         this.updating = true;
+	
+	if (url.toLowerCase().indexOf("rsstogeorss")!== -1)	
+		url += "&username=avera";
         
         MashupPlatform.http.makeRequest(url, {
             method: 'GET',

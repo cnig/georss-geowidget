@@ -4,7 +4,7 @@
         <Vendor>CoNWeT</Vendor>
         <Name>georss-geowidget</Name>
         <DisplayName>GeoRSS Reader</DisplayName>
-        <Version>0.4</Version>
+        <Version>0.5.1</Version>
         <Author>jmostazo</Author>
         <Mail>jmostazo@fi.upm.es</Mail>
         <Description>This widget shows GeoRSS feeds. It shares the location of the feed with other widgets.</Description>
@@ -18,11 +18,11 @@
     </Platform.StateProperties>
 
     <Platform.Wiring>
-        <Event name="location_info_event" type="text" label="Location info" friendcode="location_info"/>
-        <Event name="highlight_location_event" type="text" label="Highlight location" friendcode="location"/>
-        <Event name="link_url_event" type="text" label="Link url" friendcode="url"/>
-        <Slot  name="rss_service_slot" type="text" label="GeoRSS info" friendcode="service_info"/>
-        <Slot  name="highlight_location_slot" type="text" label="Highlight location" friendcode="location"/>
+        <OutputEndpoint name="location_info_event" type="text" label="Location info" friendcode="location_info"/>
+        <OutputEndpoint name="highlight_location_event" type="text" label="Highlight location" friendcode="location"/>
+        <OutputEndpoint name="link_url_event" type="text" label="Link url" friendcode="url"/>
+        <InputEndpoint  name="rss_service_slot" type="text" label="GeoRSS info" friendcode="service_info"/>
+        <InputEndpoint  name="highlight_location_slot" type="text" label="Highlight location" friendcode="location"/>
     </Platform.Wiring>
 
     <Platform.Link>
