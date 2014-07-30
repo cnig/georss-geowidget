@@ -103,7 +103,7 @@ conwet.Gadget = Class.create({
 
         var nameDiv = document.createElement('div');
 
-        nameDiv.appendChild(document.createTextNode(_("Añada un servidor GeoRSS")));
+        nameDiv.appendChild(document.createTextNode(_("Add a GeoRSS server to display its data.")));
         nameDiv.id = "rss_server_name";
         nameDiv.addClassName("rss_server_name");
         $("chan_title").appendChild(nameDiv);
@@ -173,7 +173,7 @@ conwet.Gadget = Class.create({
         $('reloadingImg').show();
         
         if(!silent)
-            this.showMessage("Solicitando datos al servidor.", true);
+            this.showMessage("Requesting data from server.", true);
         
         //Set the status to updating.
         //The interval cant update is there is already an update in process
@@ -198,7 +198,7 @@ conwet.Gadget = Class.create({
                 $('reloadImg').show();
                 $('reloadingImg').hide();
                 if(!silent)
-                    this.showError("El servidor no responde.");
+                    this.showError("Server not responding.");
                 this.updating = false;
             }.bind(this)
         });

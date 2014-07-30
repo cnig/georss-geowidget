@@ -4,7 +4,7 @@
         <Vendor>CoNWeT</Vendor>
         <Name>georss-geowidget</Name>
         <DisplayName>GeoRSS Reader</DisplayName>
-        <Version>0.5.2</Version>
+        <Version>0.5.3</Version>
         <Author>jmostazo</Author>
         <Mail>jmostazo@fi.upm.es</Mail>
         <Description>This widget shows GeoRSS feeds. It shares the location of the feed with other widgets.</Description>
